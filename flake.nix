@@ -1,11 +1,19 @@
 {
   description = "Zen Browser";
 
-  inputs.nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
 
   outputs = {
     self,
     nixpkgs,
+    home-manager,
+    ...
   }: let
     mkZen = name: system: entry: let
       pkgs = import nixpkgs {inherit system;};
@@ -156,5 +164,9 @@
       twilight = mkZen "twilight" system "twilight";
       twilight-official = mkZen "twilight" system "twilight-official";
     });
+
+    homeManagerModules.default = import ./hm-module.nix {
+      inherit self home-manager;
+    };
   };
 }
